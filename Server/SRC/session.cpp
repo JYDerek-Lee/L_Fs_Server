@@ -64,13 +64,24 @@ std::string L::Session::getList() {
 }
 
 std::string L::Session::fileUpload(std::string file_name) {
-	char read_buf[200] = { 0, };
+	char read_buf[1024] = { 0, };
+	int fileSize = 0;
+	std::string getFileSize;
 	std::ofstream ost;
 	ost.open(file_name);
 
-	while (m_Socket.read_some(boost::asio::buffer(read_buf)) != 0)
+	//m_Socket.read_some(boost::asio::buffer(getFileSize));
+	//fileSize = atoi(getFileSize.c_str());
+
+	do {
+		m_Socket.read_some(boost::asio::buffer(read_buf));	
+		if (!strcmp(read_buf, "END")) break;
 		ost << read_buf << std::endl;
+		std::cout << "get data is : " << read_buf << std::endl;
+	} while (sizeof(read_buf) < fileSize);
+	
 	ost.close();
+	std::cout << "fileUpload Get End" << std::endl;
 	return "success!!";
 }
 
@@ -100,7 +111,7 @@ void L::Session::handleReceive(const boost::system::error_code& error, size_t by
 	}
 	else {
 		const std::string strRecvMessage = m_ReceiveBuffer;
-		std::cout << "Message from Client : " << strRecvMessage << std::endl;
+		std::cout << "\n\nMessage from Client : " << strRecvMessage << std::endl;
 		std::stringstream msgBuffer(strRecvMessage);
 		msgBuffer >> mbuffer;
 
