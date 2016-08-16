@@ -100,7 +100,7 @@ void L::Session::handleReceive(const boost::system::error_code& error, size_t by
 	}
 	else {
 		const std::string strRecvMessage = m_ReceiveBuffer;
-		std::cout << "Message from Client: " << strRecvMessage << std::endl;
+		std::cout << "Message from Client : " << strRecvMessage << std::endl;
 		std::stringstream msgBuffer(strRecvMessage);
 		msgBuffer >> mbuffer;
 
@@ -148,6 +148,7 @@ void L::Session::handleReceive(const boost::system::error_code& error, size_t by
 			    boost::asio::placeholders::error,
 			    boost::asio::placeholders::bytes_transferred)
 		);
+		std::cout << "Send Process Ok" << std::endl;
 		PostReceive();
 	}
 }

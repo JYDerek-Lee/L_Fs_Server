@@ -29,7 +29,8 @@ namespace L {
 		std::string mbuffer;
 		std::string cur_name;
 		std::string desc_name;
-		char m_ReceiveBuffer[128];
+		char m_ReceiveBuffer[1024];
+		//std::string m_ReceiveBuffer;
 		std::string m_WriteMessage;
 		boost::asio::ip::tcp::socket m_Socket;
 	};
