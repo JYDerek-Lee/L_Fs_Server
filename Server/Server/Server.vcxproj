@@ -67,6 +67,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\SRC\main.cpp" />
+    <ClCompile Include="..\SRC\server.cpp" />
+    <ClCompile Include="..\SRC\session.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\SRC\server.h" />
+    <ClInclude Include="..\SRC\session.h" />
+    <ClInclude Include="..\SRC\stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
