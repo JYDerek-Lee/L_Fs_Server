@@ -7,11 +7,10 @@ void L::TCP_Server::StartAccept() {
 	m_pSession = new Session(m_acceptor.get_io_service());
 
 	m_acceptor.async_accept(m_pSession->Socket(),
-		boost::bind(&TCP_Server::handle_accept,
-		this,
-		m_pSession,
-		boost::asio::placeholders::error)
-		);
+		boost::bind(&TCP_Server::handle_accept, this,
+		    m_pSession,
+		    boost::asio::placeholders::error)
+	);
 }
 
 void L::TCP_Server::handle_accept(Session* pSession, const boost::system::error_code& error) {

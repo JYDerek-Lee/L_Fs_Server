@@ -14,23 +14,23 @@ namespace L {
 
 
 	private:
-		void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
-		void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
+		void handleWrite(const boost::system::error_code& error, size_t bytes_transferred);
+		void handleReceive(const boost::system::error_code& error, size_t bytes_transferred);
 
 		std::string getPath();
 		std::string getList();
-		std::string remove_file(std::string file_name);
-		std::string remove_Dir(std::string dir_name);
-		std::string create_file(std::string file_name);
-		std::string create_Dir(std::string dir_name);
-		std::string file_upload(std::string file_name);
-		std::string re_name(std::string cur_name, std::string desc_name);
+		std::string removeFile(std::string file_name);
+		std::string removeDir(std::string dir_name);
+		std::string createFile(std::string file_name);
+		std::string createDir(std::string dir_name);
+		std::string fileUpload(std::string file_name);
+		std::string reName(std::string cur_name, std::string desc_name);
 
-		boost::asio::ip::tcp::socket m_Socket;
-		std::string m_WriteMessage;
-		char m_ReceiveBuffer[128];
 		std::string mbuffer;
 		std::string cur_name;
 		std::string desc_name;
+		char m_ReceiveBuffer[128];
+		std::string m_WriteMessage;
+		boost::asio::ip::tcp::socket m_Socket;
 	};
 }
