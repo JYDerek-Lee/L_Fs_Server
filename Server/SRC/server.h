@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "session.h"
 
-const unsigned short PORT_NUMBER = 31400;
+const unsigned short PORT_NUMBER = 6666;
 
 namespace L {
 	class TCP_Server {

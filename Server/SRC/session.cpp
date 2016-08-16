@@ -78,14 +78,15 @@ void L::Session::PostReceive() {
 	memset(&m_ReceiveBuffer, 0x00, sizeof(m_ReceiveBuffer));
 
 	m_Socket.async_read_some(boost::asio::buffer(m_ReceiveBuffer),
-		boost::bind(&Session::handleReceive, this,
+		boost::bind(&Session::handleReceive, 
+		    this,
 		    boost::asio::placeholders::error,
 		    boost::asio::placeholders::bytes_transferred)
 	);
 }
 
 void L::Session::handleWrite(const boost::system::error_code& error, size_t bytes_transferred) {
-	m_WriteMessage = ""; 
+	//m_WriteMessage = ""; 
 }
 
 void L::Session::handleReceive(const boost::system::error_code& error, size_t bytes_transferred) {
@@ -142,9 +143,10 @@ void L::Session::handleReceive(const boost::system::error_code& error, size_t by
 			m_WriteMessage = "command not found";
 		}
 		boost::asio::async_write(m_Socket, boost::asio::buffer(m_WriteMessage),
-			boost::bind(&Session::handleWrite, this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred)
+			boost::bind(&Session::handleWrite, 
+			    this,
+			    boost::asio::placeholders::error,
+			    boost::asio::placeholders::bytes_transferred)
 		);
 		PostReceive();
 	}
