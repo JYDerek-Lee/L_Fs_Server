@@ -10,9 +10,19 @@ std::string L::Session::reName(std::string cur_name, std::string desc_name) {
 	return "success!!";
 }
 
-std::string L::Session::getPath() {
-	path my_path(initial_path());
-	return my_path.string();
+void L::Session::getPath() {
+	std::iostream returnData(&postBuffer);
+
+	std::cout << __FUNCTION__ << "경로 요청" << std::endl;
+
+	directory_iterator end;
+	for (directory_iterator iterator(current_path()); iterator!=end; iterator++) {
+		if (is_directory(*iterator)) returnData << "폴더 : ";
+		else returnData << "파일 : ";
+		returnData << iterator->path().leaf() << "\n";
+	}
+
+	returnData << "123" << "\n\n";
 }
 
 std::string L::Session::removeFile(std::string file_name) {
@@ -85,81 +95,100 @@ std::string L::Session::fileUpload(std::string file_name) {
 	return "success!!";
 }
 
+
+
+//=====================================================================
+//=====================================================================
+//=====================================================================
+//=====================================================================
+//=====================================================================
+//=====================================================================
 void L::Session::PostReceive() {
-	memset(&m_ReceiveBuffer, 0x00, sizeof(m_ReceiveBuffer));
+	std::cout << "● 클라이언트 접속 시작" << std::endl;
+	std::cout << "●" << __FUNCTION__ << "\n" << std::endl;
 
-	m_Socket.async_read_some(boost::asio::buffer(m_ReceiveBuffer),
-		boost::bind(&Session::handleReceive, 
-		    this,
-		    boost::asio::placeholders::error,
-		    boost::asio::placeholders::bytes_transferred)
-	);
+	//memset(&getBuffer, 0x00, sizeof(getBuffer));
+	
+	async_read_until(m_Socket, getBuffer, "\n\n",
+		boost::bind(&L::Session::ReceiveHandle,
+		    shared_from_this(),
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred));
 }
 
-void L::Session::handleWrite(const boost::system::error_code& error, size_t bytes_transferred) {
-	//m_WriteMessage = ""; 
-}
-
-void L::Session::handleReceive(const boost::system::error_code& error, size_t bytes_transferred) {
-	if (error) {
-		if (error == boost::asio::error::eof) {
-			std::cout << "Client disconnect." << std::endl;
+void L::Session::ReceiveHandle(const boost::system::error_code& receiveError, size_t bytes_transferred) {
+	if (receiveError) {
+		if (receiveError == boost::asio::error::eof) {
+			//std::cout << "Client disconnect." << std::endl;
+			ErrorHandle(__FUNCTION__, receiveError);
 		}
 		else {
-			std::cout << "error No : " << error.value() << " error Message : " << error.message() << std::endl;
+			//std::cout << "error No : " << receiveError.value() << " error Message : " << receiveError.message() << std::endl;
+			ErrorHandle(__FUNCTION__, receiveError);
 		}
 	}
 	else {
-		const std::string strRecvMessage = m_ReceiveBuffer;
-		std::cout << "\n\nMessage from Client : " << strRecvMessage << std::endl;
-		std::stringstream msgBuffer(strRecvMessage);
-		msgBuffer >> mbuffer;
+		std::iostream getBuffer_(&getBuffer);
+		std::string commend;
 
-		if (mbuffer == "pwd") {
-			m_WriteMessage = getPath();
+		getBuffer_ >> commend;
+
+		if (commend == "getPath") {
+			getPath();
 		}
-		else if (mbuffer == "ls") {
+		else if (commend == "ls") {
 			m_WriteMessage = getList();
 		}
-		else if (mbuffer == "mkdir") {
+		/*else if (commend == "mkdir") {
 			msgBuffer >> cur_name;
 			m_WriteMessage = createDir(cur_name);
 		}
-		else if (mbuffer == "rmdir") {
+		else if (commend == "rmdir") {
 			msgBuffer >> cur_name;
 			m_WriteMessage = removeDir(cur_name);
 		}
-		else if (mbuffer == "mkfile") {
+		else if (commend == "mkfile") {
 			msgBuffer >> cur_name;
 			m_WriteMessage = createFile(cur_name);
 		}
-		else if (mbuffer == "rm") {
+		else if (commend == "rm") {
 			msgBuffer >> cur_name;
 			m_WriteMessage = removeFile(cur_name);
 		}
-		else if (mbuffer == "cp") {
+		else if (commend == "cp") {
 			msgBuffer >> cur_name;
 			msgBuffer >> desc_name;
 		}
-		else if (mbuffer == "rename") {
+		else if (commend == "rename") {
 			msgBuffer >> cur_name;
 			msgBuffer >> desc_name;
 			m_WriteMessage = reName(cur_name, desc_name);
 		}
-		else if (mbuffer == "upload") {
+		else if (commend == "upload") {
 			msgBuffer >> cur_name;
 			m_WriteMessage = fileUpload(cur_name);
 		}
 		else {
 			m_WriteMessage = "command not found";
-		}
-		boost::asio::async_write(m_Socket, boost::asio::buffer(m_WriteMessage),
-			boost::bind(&Session::handleWrite, 
-			    this,
+		}*/
+
+		std::cout << "클라에게 데이터 전송" << std::endl;
+		async_write(m_Socket, postBuffer,
+			boost::bind(&Session::WriteHandle,
+			    shared_from_this(),
 			    boost::asio::placeholders::error,
 			    boost::asio::placeholders::bytes_transferred)
 		);
-		std::cout << "Send Process Ok" << std::endl;
+
 		PostReceive();
 	}
+}
+
+void L::Session::WriteHandle(const boost::system::error_code& writeError, size_t bytes_transferred) {
+	//m_WriteMessage = ""; 
+}
+
+void L::Session::ErrorHandle(const std::string& functionName, const boost::system::error_code& err) {
+	std::cout << "● Error is Found ●" << std::endl;
+	std::cout << __FUNCTION__ << " Error : " << functionName << "What for : " << err << " " << err.message() << std::endl;
 }
